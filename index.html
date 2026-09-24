@@ -3,337 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contra - Encuentra Trabajo y Talento</title>
+    <title>Contrabajo - Encuentra Trabajo y Talento</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* === Variables y Configuración Base === */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            --text-light: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.7);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* === Fondo Vibrante (Mesh Gradient) === */
-        body {
-            min-height: 100vh;
-            background: linear-gradient(45deg, #d4b3b3, #33333b, #38211b);
-            background-size: 400% 400%;
-            animation: gradientAnim 15s ease infinite;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            overflow-x: hidden;
-        }
-
-        @keyframes gradientAnim {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* === Contenedor Principal Dashboard === */
-        .dashboard-container {
-            width: 100%;
-            max-width: 1400px;
-            height: 90vh;
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 2rem;
-        }
-
-        /* === Clase Reutilizable Glassmorphism === */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* === Barra Lateral (Sidebar) === */
-        .sidebar {
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .logo-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px; /* Espacio entre la imagen y el texto */
-        margin-bottom: 1rem;
-        }
-
-/* Estilos de la imagen del logo */
-        .logo-img {
-        width: 100px; /* Ajusta este valor según las proporciones de tu logo */
-        position: fixed; 
-        height: auto;
-        object-fit: contain; 
-        mix-blend-mode: auto;
-        /* Opcional: Agrega una sombra sutil para darle profundidad */
-        filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.2));
-        }
-
-/* Estilos del texto (mantiene el degradado original) */
-        .logo-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background-clip: -webkit-linear-gradient();
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        beige: '#f4f1ea',
+                        charcoal: '#222428',
+                        orange: '#d9774b',
+                        red: '#c1292e',
+                        surface: '#ffffff'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
             }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
         }
 
-        .nav-links li {
-            padding: 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
+        /* Toast Animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .toast-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .toast-exit {
+            animation: fadeOut 0.3s ease-out forwards;
         }
 
-        .nav-links li:hover, .nav-links li.active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
+        /* Nav item active transition */
+        .nav-item {
+            transition: all 0.2s ease-in-out;
         }
-
-        /* === Área Principal === */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            padding: 2rem;
-            overflow-y: auto;
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
         }
-
-        /* Header / Buscador */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .view-section.active {
+            display: block;
         }
-
-        .search-bar {
-            width: 50%;
-            display: flex;
-            gap: 1rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .search-bar input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border-radius: 50px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            backdrop-filter: blur(10px);
-            outline: none;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-bar input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .search-bar input:focus {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .profile-btn {
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .profile-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Título de Bienvenida */
-        .welcome-text h1 {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-text p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        /* Tarjetas de Contenido (Grid) */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .card {
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .card-btn {
-            margin-top: auto;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333399;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .card-btn:hover {
-            background: #fff;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
-        }
-
-        /* Ocultar scrollbar para estética limpia */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="bg-beige text-charcoal font-sans h-screen overflow-hidden flex">
 
-    <div class="dashboard-container">
-        <aside class="sidebar glass">
-            <div class="logo-wrapper">
-    <!-- Cambia "tu-logo.png" por la ruta real de tu imagen -->
-    <img src="logo.png" alt="Logo Contra" class="logo-img">
-    <span class="logo-text">Contra</span>
-    </div>
-            <ul class="nav-links">
-                <li class="active">Dashboard</li>
-                <li>Buscar Trabajo</li>
-                <li>Buscar Talento</li>
-                <li>Mensajes <span style="background: red; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 10px;">3</span></li>
-                <li>Mi Perfil</li>
-                <li>Configuración</li>
-            </ul>
-        </aside>
-
-        <main class="main-content glass">
-            <header class="header">
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Busca desarrolladores, diseñadores o empleos...">
+    <aside class="w-64 bg-surface shadow-lg flex flex-col h-full z-20 transition-transform duration-300 transform -translate-x-full md:translate-x-0 fixed md:relative" id="sidebar">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-100">
+            <img src="logo.jpg" alt="Logo Contrabajo" class="w-12 h-12 object-contain rounded-full border border-gray-200 shadow-sm" onerror="this.src='https://placehold.co/100x100/d9774b/ffffff?text=C'">
+            <span class="text-xl font-bold tracking-wide text-charcoal uppercase">Contrabajo</span>
+            <!-- Mobile close button -->
+            <button class="md:hidden ml-auto text-gray-500 hover:text-red" onclick="toggleSidebar()">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+        </div>
+        
+        <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+            <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-orange bg-orange/10 border-r-4 border-orange">
+                <i class="ph ph-squares-four text-xl"></i>
+                Dashboard
+            </button>
+            <button onclick="navigate('jobs')" id="nav-jobs" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200">
+                <i class="ph ph-briefcase text-xl"></i>
+                Buscar Trabajo
+            </button>
+            <button onclick="navigate('talent')" id="nav-talent" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200">
+                <i class="ph ph-users text-xl"></i>
+                Buscar Talento
+            </button>
+            <button onclick="navigate('messages')" id="nav-messages" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200 justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-chat-circle-dots text-xl"></i>
+                    Mensajes
                 </div>
-                <button class="profile-btn" onclick="alert('Abriendo perfil...')">Mi Cuenta</button>
-            </header>
+                <span class="bg-red text-white text-xs px-2 py-0.5 rounded-full">3</span>
+            </button>
+            <button onclick="navigate('profile')" id="nav-profile" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200">
+                <i class="ph ph-user text-xl"></i>
+                Mi Perfil
+            </button>
+            <button onclick="navigate('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200">
+                <i class="ph ph-gear text-xl"></i>
+                Configuración
+            </button>
+        </nav>
 
-            <section class="welcome-text">
-                <h1 id="greeting">¡Hola, bienvenido a Contra!</h1>
-                <p>El lugar donde el talento de clase mundial se encuentra con empresas innovadoras.</p>
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-10 h-10 rounded-full bg-orange/20 flex items-center justify-center text-orange font-bold">JD</div>
+                <div>
+                    <p class="text-sm font-semibold">Juan Doe</p>
+                    <p class="text-xs text-gray-500">Usuario Pro</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="bg-surface shadow-sm px-6 py-4 flex items-center justify-between z-10">
+            <div class="flex items-center gap-4 flex-1">
+                <button class="md:hidden text-gray-600 hover:text-orange" onclick="toggleSidebar()">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <div class="relative w-full max-w-md hidden sm:block">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="global-search" placeholder="Buscar empleos, perfiles, habilidades..." class="w-full bg-beige border border-gray-200 text-charcoal rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-orange focus:ring-1 focus:ring-orange transition-shadow">
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="text-gray-500 hover:text-orange transition-colors relative">
+                    <i class="ph ph-bell text-2xl"></i>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red rounded-full border-2 border-surface"></span>
+                </button>
+                <button onclick="showToast('Abriendo opciones de cuenta...', 'info')" class="bg-surface border border-gray-200 text-charcoal font-medium py-2 px-5 rounded-full hover:border-orange hover:text-orange transition-colors text-sm shadow-sm">
+                    Mi Cuenta
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8">
+            
+            <!-- VIEW: Dashboard -->
+            <section id="view-dashboard" class="view-section active max-w-6xl mx-auto">
+                <div class="mb-8">
+                    <h1 id="greeting" class="text-3xl font-bold text-charcoal mb-2">¡Hola, bienvenido a Contrabajo!</h1>
+                    <p class="text-gray-600">El lugar donde el talento se remanga la camisa y encuentra a las mejores empresas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="bg-surface p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-orange/10 rounded-full flex items-center justify-center text-orange mb-4">
+                            <i class="ph ph-briefcase text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Para Profesionales 🚀</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-1">Encuentra oportunidades de trabajo remoto, presencial o híbrido. Desde tecnología hasta oficios expertos.</p>
+                        <button onclick="navigate('jobs')" class="w-full bg-orange text-white font-medium py-2.5 rounded-xl hover:bg-orange/90 transition-colors shadow-sm">
+                            Explorar Empleos
+                        </button>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-surface p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-red/10 rounded-full flex items-center justify-center text-red mb-4">
+                            <i class="ph ph-buildings text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Para Empresas 🏢</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-1">Accede a nuestra red de talento. Publica tus vacantes de forma sencilla y encuentra al candidato ideal (¡con pala y todo!).</p>
+                        <button onclick="navigate('talent')" class="w-full bg-surface border border-gray-200 text-charcoal font-medium py-2.5 rounded-xl hover:border-red hover:text-red transition-colors shadow-sm">
+                            Buscar Talento
+                        </button>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-charcoal text-white p-6 rounded-2xl shadow-sm flex flex-col relative overflow-hidden">
+                        <!-- Decorative background element -->
+                        <i class="ph ph-trend-up absolute -bottom-6 -right-6 text-9xl text-white/5"></i>
+                        
+                        <h3 class="text-xl font-semibold mb-4 relative z-10">Estadísticas Rápidas 📊</h3>
+                        <div class="space-y-4 mb-6 flex-1 relative z-10">
+                            <div class="flex items-center gap-3">
+                                <i class="ph ph-star text-orange text-xl"></i>
+                                <span><b class="text-orange">1,200+</b> Ofertas activas</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="ph ph-users text-orange text-xl"></i>
+                                <span><b class="text-orange">5,000+</b> Profesionales</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="ph ph-handshake text-orange text-xl"></i>
+                                <span><b class="text-orange">85%</b> Éxito de contrato</span>
+                            </div>
+                        </div>
+                        <button onclick="showToast('Generando reporte de actividad...', 'success')" class="w-full bg-white/10 border border-white/20 text-white font-medium py-2.5 rounded-xl hover:bg-white/20 transition-colors relative z-10">
+                            Ver Reportes
+                        </button>
+                    </div>
+                </div>
             </section>
 
-            <section class="cards-grid">
-                <div class="card glass">
-                    <h3>Para Profesionales 🚀</h3>
-                    <p>Encuentra oportunidades de trabajo remoto, presencial o híbrido que se adapten a tus habilidades. Destaca tu perfil y conecta con empresas líderes.</p>
-                    <button class="card-btn">Explorar Empleos</button>
+            <!-- VIEW: Buscar Trabajo -->
+            <section id="view-jobs" class="view-section max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-charcoal">Oportunidades Disponibles</h2>
+                        <p class="text-gray-600 text-sm mt-1">Explora las mejores ofertas, desde el teclado hasta la pala.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select class="bg-surface border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange">
+                            <option>Todos los sectores</option>
+                            <option>Tecnología</option>
+                            <option>Construcción y Oficios</option>
+                            <option>Diseño</option>
+                        </select>
+                        <button class="bg-surface border border-gray-200 rounded-lg px-4 py-2 text-sm hover:text-orange transition-colors flex items-center gap-2">
+                            <i class="ph ph-faders"></i> Filtros
+                        </button>
+                    </div>
                 </div>
 
-                <div class="card glass">
-                    <h3>Para Empresas 🏢</h3>
-                    <p>Accede a nuestra red global de talento verificado. Publica tus vacantes de forma sencilla y encuentra al candidato ideal para tu equipo.</p>
-                    <button class="card-btn">Publicar Vacante</button>
-                </div>
-
-                <div class="card glass">
-                    <h3>Estadísticas Rápidas 📊</h3>
-                    <p>⭐ <b>1,200+</b> Ofertas de empleo activas<br>
-                       👤 <b>5,000+</b> Perfiles profesionales<br>
-                       🤝 <b>85%</b> Tasa de contratación exitosa</p>
-                    <button class="card-btn" style="background: transparent; color: white; border: 1px solid white;">Ver Reportes</button>
+                <!-- Contenedor dinámico de empleos -->
+                <div id="jobs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Jobs will be injected here by JS -->
                 </div>
             </section>
+
+            <!-- VIEW: Buscar Talento (Placeholder) -->
+            <section id="view-talent" class="view-section max-w-4xl mx-auto text-center py-20">
+                <div class="w-24 h-24 bg-orange/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="ph ph-users-three text-5xl text-orange"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-3">Directorio de Talento</h2>
+                <p class="text-gray-600 mb-8 max-w-lg mx-auto">Busca entre miles de perfiles verificados. Filtra por habilidades, experiencia y disponibilidad para encontrar tu próximo gran fichaje.</p>
+                <div class="flex justify-center max-w-md mx-auto relative">
+                    <input type="text" placeholder="Ej: Desarrollador React, Soldador..." class="w-full bg-surface border border-gray-200 rounded-full py-3 pl-6 pr-32 focus:outline-none focus:border-orange shadow-sm">
+                    <button onclick="showToast('Buscando talento...', 'info')" class="absolute right-1 top-1 bottom-1 bg-orange text-white px-6 rounded-full font-medium hover:bg-orange/90 transition-colors">
+                        Buscar
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIEW: Mensajes (Placeholder) -->
+            <section id="view-messages" class="view-section max-w-5xl mx-auto h-[70vh]">
+                <div class="bg-surface rounded-2xl shadow-sm border border-gray-100 flex h-full overflow-hidden">
+                    <div class="w-1/3 border-r border-gray-100 flex flex-col">
+                        <div class="p-4 border-b border-gray-100 font-semibold">Mensajes (3 Nuevos)</div>
+                        <div class="flex-1 overflow-y-auto">
+                            <!-- Dummy Chats -->
+                            <div class="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer bg-orange/5 flex gap-3">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-baseline"><h4 class="font-medium text-sm truncate">TechCorp HR</h4><span class="text-xs text-orange font-medium">10:42 AM</span></div>
+                                    <p class="text-xs text-gray-500 truncate">Hemos revisado tu portafolio y...</p>
+                                </div>
+                            </div>
+                            <div class="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer bg-orange/5 flex gap-3">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-baseline"><h4 class="font-medium text-sm truncate">Construcciones S.A.</h4><span class="text-xs text-orange font-medium">Ayer</span></div>
+                                    <p class="text-xs text-gray-500 truncate">¿Cuándo podrías empezar la obra?</p>
+                                </div>
+                            </div>
+                            <div class="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer flex gap-3">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-baseline"><h4 class="font-medium text-sm truncate">Ana Martínez</h4><span class="text-xs text-gray-400">Lun</span></div>
+                                    <p class="text-xs text-gray-500 truncate">Gracias por la información enviada.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50/50">
+                        <i class="ph ph-chat-teardrop-text text-6xl mb-4"></i>
+                        <p>Selecciona un chat para ver la conversación</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: Perfil & Configuración (Placeholder) -->
+            <section id="view-profile" class="view-section max-w-3xl mx-auto py-10">
+                <div class="bg-surface rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+                    <div class="w-32 h-32 bg-orange/20 rounded-full flex items-center justify-center text-orange text-4xl font-bold mx-auto mb-6 relative">
+                        JD
+                        <button class="absolute bottom-0 right-0 w-8 h-8 bg-surface border border-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:text-orange shadow-sm">
+                            <i class="ph ph-pencil-simple"></i>
+                        </button>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-1">Juan Doe</h2>
+                    <p class="text-gray-500 mb-6">Desarrollador Fullstack & Entusiasta del Bricolaje</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="showToast('Perfil actualizado', 'success')" class="bg-orange text-white px-6 py-2 rounded-xl font-medium hover:bg-orange/90 transition-colors">Guardar Cambios</button>
+                        <button onclick="showToast('Descargando CV...', 'info')" class="bg-surface border border-gray-200 text-charcoal px-6 py-2 rounded-xl font-medium hover:border-gray-300 transition-colors">Descargar CV</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-settings" class="view-section max-w-3xl mx-auto py-10">
+                <h2 class="text-2xl font-bold mb-6">Configuración de la Cuenta</h2>
+                <div class="bg-surface rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+                    <div class="p-6 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-medium">Notificaciones por Email</h4>
+                            <p class="text-sm text-gray-500">Recibe alertas de nuevos empleos.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange"></div>
+                        </label>
+                    </div>
+                    <div class="p-6 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-medium">Modo Oscuro</h4>
+                            <p class="text-sm text-gray-500">Cambia la apariencia de la aplicación.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange"></div>
+                        </label>
+                    </div>
+                    <div class="p-6">
+                        <button onclick="showToast('Sesión cerrada correctamente', 'success')" class="text-red font-medium hover:underline flex items-center gap-2">
+                            <i class="ph ph-sign-out"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
+    <!-- Container for Custom Toasts -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
     <script>
-        // Saludo dinámico basado en la hora del día
+        // --- 1. SPA Navigation Logic ---
+        function navigate(viewId) {
+            // Hide all views
+            const views = document.querySelectorAll('.view-section');
+            views.forEach(view => view.classList.remove('active'));
+            
+            // Show target view
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+
+            // Update sidebar active states
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                // Reset styling to inactive state
+                item.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-gray-600 hover:bg-gray-50 hover:text-charcoal border-r-4 border-transparent hover:border-gray-200';
+                
+                // Add conditional classes to messages badge to prevent layout break
+                if(item.id === 'nav-messages') item.classList.add('justify-between');
+            });
+
+            // Set active styling
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) {
+                activeNav.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-orange bg-orange/10 border-r-4 border-orange';
+                if(activeNav.id === 'nav-messages') activeNav.classList.add('justify-between');
+            }
+
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // --- 2. Dynamic Greeting ---
         const setGreeting = () => {
             const hour = new Date().getHours();
             const greetingElement = document.getElementById('greeting');
             
             if (hour < 12) {
-                greetingElement.textContent = '¡Buenos días! Bienvenido a Contra';
+                greetingElement.textContent = '¡Buenos días! Bienvenido a Contrabajo';
             } else if (hour < 18) {
-                greetingElement.textContent = '¡Buenas tardes! Bienvenido a Contra';
+                greetingElement.textContent = '¡Buenas tardes! Bienvenido a Contrabajo';
             } else {
-                greetingElement.textContent = '¡Buenas noches! Bienvenido a Contra';
+                greetingElement.textContent = '¡Buenas noches! Bienvenido a Contrabajo';
             }
         }
 
-        // Efecto activo en la barra lateral
-        const navItems = document.querySelectorAll('.nav-links li');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        // --- 3. Custom Message/Toast System ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            // Icon and colors based on type
+            let icon = 'ph-info';
+            let bgClass = 'bg-charcoal text-white';
+            
+            if (type === 'success') {
+                icon = 'ph-check-circle';
+                bgClass = 'bg-[#2E7D32] text-white'; // Greenish
+            } else if (type === 'error') {
+                icon = 'ph-warning-circle';
+                bgClass = 'bg-red text-white';
+            }
 
-        // Búsqueda simple en consola para demostrar funcionalidad
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('keypress', function(e) {
+            toast.className = `toast-enter ${bgClass} px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 pointer-events-auto max-w-sm`;
+            toast.innerHTML = `
+                <i class="ph ${icon} text-xl"></i>
+                <p class="text-sm font-medium">${message}</p>
+            `;
+
+            container.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-exit');
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                });
+            }, 3000);
+        }
+
+        // --- 4. Render Fictitious Jobs ---
+        const jobsData = [
+            { title: "Desarrollador Frontend React", company: "TechCorp Innova", location: "Remoto", salary: "$3,000 - $4,500 / mes", type: "Tech", icon: "ph-code" },
+            { title: "Maestro de Obra", company: "Construcciones S.A.", location: "Bogotá, COL", salary: "$1,500 / mes", type: "Físico", icon: "ph-wall" },
+            { title: "Diseñador UX/UI", company: "Creative Studio", location: "Medellín, COL", salary: "$1,800 - $2,500 / mes", type: "Tech", icon: "ph-paint-brush-broad" },
+            { title: "Jardinero Paisajista", company: "EcoJardines SAS", location: "Cali, COL", salary: "$900 / mes", type: "Físico", icon: "ph-plant" },
+            { title: "Ingeniero Backend Node.js", company: "DataSys Global", location: "Remoto", salary: "$3,500 - $5,000 / mes", type: "Tech", icon: "ph-database" },
+            { title: "Plomero Especialista", company: "ServiYa Hogar", location: "Cali, COL", salary: "$1,000 / mes + Comisiones", type: "Físico", icon: "ph-wrench" }
+        ];
+
+        function renderJobs() {
+            const grid = document.getElementById('jobs-grid');
+            grid.innerHTML = ''; // Clear existing
+
+            jobsData.forEach((job, index) => {
+                // Determine pill color based on type
+                const pillClass = job.type === 'Tech' ? 'bg-blue-100 text-blue-700' : 'bg-orange/20 text-orange';
+                
+                const card = document.createElement('div');
+                card.className = 'bg-surface p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow relative';
+                card.innerHTML = `
+                    <div class="absolute top-6 right-6">
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full ${pillClass}">${job.type}</span>
+                    </div>
+                    <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-charcoal mb-4 border border-gray-100">
+                        <i class="ph ${job.icon} text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-charcoal mb-1 leading-tight">${job.title}</h3>
+                    <p class="text-sm text-gray-500 mb-4">${job.company}</p>
+                    
+                    <div class="space-y-2 mb-6 flex-1">
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="ph ph-map-pin text-gray-400"></i> ${job.location}
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="ph ph-currency-dollar text-gray-400"></i> ${job.salary}
+                        </div>
+                    </div>
+                    
+                    <button onclick="applyJob('${job.title}', this)" class="w-full bg-surface border border-gray-200 text-charcoal font-medium py-2 rounded-xl hover:border-orange hover:text-orange transition-colors">
+                        Aplicar ahora
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Job application interaction
+        function applyJob(jobTitle, buttonElement) {
+            // Change button state temporarily to show loading
+            const originalText = buttonElement.innerText;
+            buttonElement.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Enviando...`;
+            buttonElement.disabled = true;
+            buttonElement.classList.add('opacity-75');
+
+            setTimeout(() => {
+                showToast(`¡Has aplicado a "${jobTitle}" con éxito!`, 'success');
+                // Revert button
+                buttonElement.innerHTML = `¡Aplicado! <i class="ph ph-check"></i>`;
+                buttonElement.classList.remove('hover:border-orange', 'hover:text-orange', 'text-charcoal');
+                buttonElement.classList.add('text-green-600', 'border-green-200', 'bg-green-50');
+            }, 800);
+        }
+
+        // Search bar listener
+        document.getElementById('global-search').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                alert('Buscando: ' + this.value);
-                this.value = ''; // Limpiar el input
+                if(this.value.trim() !== '') {
+                    showToast(`Buscando: ${this.value}`, 'info');
+                    this.value = '';
+                }
             }
         });
 
-        // Inicializar
-        setGreeting();
+        // Initialize App
+        window.onload = function() {
+            setGreeting();
+            renderJobs();
+            // Start on dashboard
+            navigate('dashboard');
+        };
     </script>
 </body>
 </html>
